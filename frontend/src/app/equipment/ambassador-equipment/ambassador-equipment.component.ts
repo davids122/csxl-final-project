@@ -8,6 +8,9 @@ import { Observable, reduce, tap, timer } from 'rxjs';
 import { StagedCheckoutRequestModel } from '../staged-checkout-request.model';
 import { StageCard } from '../widgets/staged-checkout-request-card/staged-checkout-request-card.widget';
 import { CheckoutRequestCard } from '../widgets/checkout-request-card/checkout-request-card.widget';
+import { EquipmentCheckoutCard } from '../widgets/equipment-checkout-card/equipment-checkout-card.widget';
+import { EquipmentCheckoutConfirmationComponent } from '../equipment-checkout-confirmation/equipment-checkout-confirmation.component';
+import { EquipmentCheckoutModel } from '../equipment-checkout.model';
 
 @Component({
   selector: 'app-ambassador-equipment',
@@ -26,9 +29,14 @@ export class AmbassadorEquipmentComponent implements OnInit {
   checkoutRequests$: Observable<CheckoutRequestModel[]>;
   checkoutRequestsLength: number = 0;
   stagedCheckoutRequests: StagedCheckoutRequestModel[];
+  equipmentCheckouts$: Observable<EquipmentCheckoutModel[]>;
+  checkoutsLength: number = 0;
 
   @ViewChild(StageCard) stageTable: StageCard | undefined;
   @ViewChild(CheckoutRequestCard) requestTable: StageCard | undefined;
+  @ViewChild(EquipmentCheckoutCard) checkoutTable:
+    | EquipmentCheckoutCard
+    | undefined;
 
   constructor(
     public router: Router,
@@ -37,16 +45,19 @@ export class AmbassadorEquipmentComponent implements OnInit {
     this.checkoutRequests$ = equipmentService.getAllRequest();
     this.getCheckoutRequestLength();
     this.stagedCheckoutRequests = [];
+    this.equipmentCheckouts$ = equipmentService.get_all_active_checkouts();
+    this.getCheckoutsLength();
   }
 
   // every 5 seconds call the get all request service method to update ambassador equipment checkout page.
   ngOnInit(): void {
     timer(0, 5000)
       .pipe(
-        tap(
-          (_) =>
-            (this.checkoutRequests$ = this.equipmentService.getAllRequest())
-        )
+        tap(() => {
+          this.checkoutRequests$ = this.equipmentService.getAllRequest();
+          this.equipmentCheckouts$ =
+            this.equipmentService.get_all_active_checkouts();
+        })
       )
       .subscribe();
   }
@@ -110,5 +121,12 @@ export class AmbassadorEquipmentComponent implements OnInit {
         reduce((count) => count + 1, 1) // Starts with 0 and increments by 1 for each item
       )
       .subscribe((count) => (this.checkoutRequestsLength = count));
+  }
+  getCheckoutsLength() {
+    this.equipmentCheckouts$
+      .pipe(
+        reduce((count) => count + 1, 1) // Starts with 0 and increments by 1 for each item
+      )
+      .subscribe((count) => (this.checkoutsLength = count));
   }
 }

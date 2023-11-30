@@ -231,7 +231,6 @@ def get_all_active_checkouts(
     Returns:
         Array of equipment checkouts
     """
-
     try:
         return equipment_service.get_all_active_checkouts(subject)
     # TODO make this the correct exception and status code
@@ -247,12 +246,10 @@ def create_equipment_checkout(
 ) -> EquipmentCheckout:
     """
     Creates an equipment checkout
-
+    
     Params:
         checkout: An EquipmentCheckout Model
         equipment_service: a valid 'EquipmentService'
-        subject: a valid User model representing the currently logged in User
-
     Returns:
         EquipmentCheckout model that was created
 
@@ -274,7 +271,7 @@ def return_checkout(
 ) -> EquipmentCheckout:
     """
     Returns an equipment checkout
-
+    
     Params:
         checkout: An EquipmentCheckout model
         equipment_service: a valid 'EquipmentService'

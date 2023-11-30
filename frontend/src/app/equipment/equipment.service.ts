@@ -5,6 +5,7 @@ import { Equipment } from './equipment.model';
 import { EquipmentType } from './equipmentType.model';
 import { Profile, ProfileService } from '../profile/profile.service';
 import { CheckoutRequestModel } from './checkoutRequest.model';
+import { EquipmentCheckoutModel } from './equipment-checkout.model';
 @Injectable({
   providedIn: 'root'
 })
@@ -118,6 +119,47 @@ export class EquipmentService {
     return this.http.put<Profile>(
       'api/equipment/update_waiver_field',
       this.profile
+    );
+  }
+
+  /**
+   * Create new equipmentCheckout model and post to backend
+   * @param user_name, pid, equipment_id, model
+   * @returns Observable<EquipmentCheckoutModel>
+   */
+  create_checkout(
+    user_name: String,
+    pid: Number,
+    equipment_id: Number,
+    model: String
+  ): Observable<EquipmentCheckoutModel> {
+    let currentDate = new Date();
+    let threeDaysLater = new Date(currentDate);
+    threeDaysLater.setDate(currentDate.getDate() + 3);
+    let checkout = {
+      user_name: user_name,
+      pid: pid,
+      equipment_id: equipment_id,
+      model: model,
+      is_active: true,
+      started_at: currentDate,
+      end_at: threeDaysLater
+    };
+
+    return this.http.post<EquipmentCheckoutModel>(
+      '/api/equipment/create_checkout',
+      checkout
+    );
+  }
+
+  /**
+   * Get all active Equipment checkout models from backend
+   *
+   * @returns Observable<EquipmentCheckoutModel[]>
+   */
+  get_all_active_checkouts(): Observable<EquipmentCheckoutModel[]> {
+    return this.http.get<EquipmentCheckoutModel[]>(
+      '/api/equipment/get_all_active_checkouts'
     );
   }
 }
