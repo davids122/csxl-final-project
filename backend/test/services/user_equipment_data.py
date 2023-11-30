@@ -4,12 +4,14 @@
 
 import pytest
 from sqlalchemy.orm import Session
+from backend.entities.equipment_checkout_entity import EquipmentCheckoutEntity
 from backend.entities.equipment_checkout_request_entity import (
     EquipmentCheckoutRequestEntity,
 )
 from backend.entities.permission_entity import PermissionEntity
 from backend.entities.user_entity import UserEntity
 from backend.models.equipment_checkout_request import EquipmentCheckoutRequest
+from datetime import datetime
 
 from backend.models.permission import Permission
 from backend.models.user import User
@@ -17,6 +19,7 @@ from backend.test.services.role_data import ambassador_role
 from .reset_table_id_seq import reset_table_id_seq
 from ...entities.equipment_entity import EquipmentEntity
 from ...models.equipment import Equipment
+from ...models.equipment_checkout import EquipmentCheckout
 from enum import Enum
 
 
@@ -82,6 +85,36 @@ quest_3_two = Equipment(
     checkout_history=[111111111],
 )
 
+arduino4 = Equipment(
+    equipment_id=6,
+    model="Arduino Uno",
+    equipment_image=DeviceType.ARDUINO_UNO.value,
+    condition=10,
+    is_checked_out=True,
+    condition_notes=[],
+    checkout_history=[],
+)
+
+arduino5 = Equipment(
+    equipment_id=7,
+    model="Arduino Uno",
+    equipment_image=DeviceType.ARDUINO_UNO.value,
+    condition=10,
+    is_checked_out=True,
+    condition_notes=[],
+    checkout_history=[],
+)
+
+arduino6 = Equipment(
+    equipment_id=8,
+    model="Arduino Uno",
+    equipment_image=DeviceType.ARDUINO_UNO.value,
+    condition=10,
+    is_checked_out=True,
+    condition_notes=[],
+    checkout_history=[],
+)
+
 checkout_request_quest_3 = EquipmentCheckoutRequest(
     user_name="Sally Student", model="Meta Quest 3", pid=111111111
 )
@@ -106,16 +139,105 @@ ambassador_permission_get_all_requested = Permission(
     id=7, action="equipment.get_equipment_for_request", resource="equipment"
 )
 
+ambassador_permission_get_all_active_checkouts = Permission(
+    id=8, action="equipment.get_all_active_checkouts", resource="equipment"
+)
+
+ambassador_permission_create_checkout = Permission(
+    id=9, action="equipment.create_checkout", resource="equipment"
+)
+
+equipment_checkout1 = EquipmentCheckout(
+    user_name="Amy",
+    pid=999999999,
+    equipment_id=2,
+    model="Arduino Uno",
+    is_active=True,
+    started_at=datetime.now(),
+    end_at=datetime.now(),
+)
+
+equipment_checkout2 = EquipmentCheckout(
+    user_name="Sally",
+    pid=111111111,
+    equipment_id=5,
+    model="Meta Quest 3",
+    is_active=True,
+    started_at=datetime.now(),
+    end_at=datetime.now(),
+)
+
+equipment_checkout3 = EquipmentCheckout(
+    user_name="Sally",
+    pid=111111111,
+    equipment_id=3,
+    model="Arduino Uno",
+    is_active=False,
+    started_at=datetime.now(),
+    end_at=datetime.now(),
+)
+
+equipment_checkout4 = EquipmentCheckout(
+    user_name="Nick",
+    pid=730477365,
+    equipment_id=6,
+    model="Arduino Uno",
+    is_active=True,
+    started_at=datetime.now(),
+    end_at=datetime.now(),
+)
+
+equipment_checkout5 = EquipmentCheckout(
+    user_name="David",
+    pid=233455677,
+    equipment_id=7,
+    model="Arduino Uno",
+    is_active=True,
+    started_at=datetime.now(),
+    end_at=datetime.now(),
+)
+
+equipment_checkout6 = EquipmentCheckout(
+    user_name="Kris",
+    pid=988766544,
+    equipment_id=8,
+    model="Arduino Uno",
+    is_active=True,
+    started_at=datetime.now(),
+    end_at=datetime.now(),
+)
+
 permissions = [
     ambassador_permission_equipment,
     ambassador_permission_delete_checkout_request,
     ambassador_permission_get_all_requests,
     ambassador_permission_get_all_requested,
+    ambassador_permission_get_all_active_checkouts,
+    ambassador_permission_create_checkout,
 ]
 
-equipment = [quest_3, arduino, arduino2, arduino3, quest_3_two]
+equipment = [
+    quest_3,
+    arduino,
+    arduino2,
+    arduino3,
+    quest_3_two,
+    arduino4,
+    arduino5,
+    arduino6,
+]
 
 checkout_requests = [checkout_request_quest_3, checkout_request_arduino]
+
+checkouts = [
+    equipment_checkout1,
+    equipment_checkout2,
+    equipment_checkout3,
+    equipment_checkout4,
+    equipment_checkout5,
+    equipment_checkout6,
+]
+
 
 def insert_fake_data(session: Session):
     global equipment
@@ -133,6 +255,12 @@ def insert_fake_data(session: Session):
         entity = EquipmentCheckoutRequestEntity.from_model(item)
         session.add(entity)
         request_entities.append(entity)
+
+    checkout_entities = []
+    for item in checkouts:
+        entity = EquipmentCheckoutEntity.from_model(item)
+        session.add(entity)
+        checkout_entities.append(entity)
 
     # Add ambassador equipment permission for testing
     for i in range(0, len(permissions)):
@@ -154,6 +282,9 @@ def insert_fake_data(session: Session):
         EquipmentCheckoutRequestEntity,
         EquipmentCheckoutRequestEntity.id,
         len(checkout_requests) + 1,
+    )
+    reset_table_id_seq(
+        session, EquipmentCheckoutEntity, EquipmentCheckoutEntity.id, len(checkouts) + 1
     )
 
     # Commit all changes

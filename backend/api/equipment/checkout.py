@@ -3,6 +3,8 @@
 This API is used to manage and list user equipment checkouts"""
 
 from fastapi import APIRouter, Depends, HTTPException
+
+from backend.models.equipment_checkout import EquipmentCheckout
 from backend.models.equipment_checkout_request import EquipmentCheckoutRequest
 
 from backend.models.equipment_type import EquipmentType
@@ -11,6 +13,7 @@ from backend.services.exceptions import WaiverNotSignedException
 from ...models.equipment import Equipment
 from ...services.equipment import (
     DuplicateEquipmentCheckoutRequestException,
+    EquipmentCheckoutNotFoundException,
     EquipmentCheckoutRequestNotFoundException,
     EquipmentService,
 )
@@ -142,7 +145,6 @@ def delete_request(
     Raises:
         EquipmentCheckoutRequestNotFoundException if request does not exist
     """
-
     try:
         # attempt to delete a checkout request
         return equipmentService.delete_request(subject, equipmentCheckoutRequest)
@@ -212,4 +214,85 @@ def update_waiver_field(
         return equipment_service.update_waiver_signed_field(subject)
     except Exception as e:
         # Raise exception if field cannot be updated
+        raise HTTPException(status_code=422, detail=str(e))
+
+
+@api.get("/get_all_active_checkouts", tags=["Equipment"])
+def get_all_active_checkouts(
+    equipment_service: EquipmentService = Depends(),
+    subject: User = Depends(registered_user),
+) -> list[EquipmentCheckout]:
+    """
+    Gets equipment checkouts
+
+    Parameters:
+        equipment_service: a valid 'EquipmentService'
+
+    Returns:
+        Array of equipment checkouts
+    """
+
+    try:
+        return equipment_service.get_all_active_checkouts(subject)
+    # TODO make this the correct exception and status code
+    except Exception as e:
+        raise HTTPException(status_code=422, detail=str(e))
+
+
+@api.post("/create_checkout", tags=["Equipment"])
+def create_equipment_checkout(
+    checkout: EquipmentCheckout,
+    equipment_service: EquipmentService = Depends(),
+    subject: User = Depends(registered_user),
+) -> EquipmentCheckout:
+    """
+    Creates an equipment checkout
+
+    Params:
+        checkout: An EquipmentCheckout Model
+        equipment_service: a valid 'EquipmentService'
+        subject: a valid User model representing the currently logged in User
+
+    Returns:
+        EquipmentCheckout model that was created
+
+    Raises:
+        422 Exception if fails to create checkout
+    """
+    try:
+        return equipment_service.create_checkout(checkout, subject)
+    # TODO make this the correct error and status code, not thinking about this right now
+    except Exception as e:
+        raise HTTPException(status_code=422, detail=str(e))
+
+
+@api.put("/return_checkout", tags=["Equipment"])
+def return_checkout(
+    checkout: EquipmentCheckout,
+    equipment_service: EquipmentService = Depends(),
+    subject: User = Depends(registered_user),
+) -> EquipmentCheckout:
+    """
+    Returns an equipment checkout
+
+    Params:
+        checkout: An EquipmentCheckout model
+        equipment_service: a valid 'EquipmentService'
+        subject: a valid User model representing the currently logged in User
+
+    Returns:
+        EquipmentCheckout model that was returned
+
+    Raises:
+        404 Exception if equipment being returned is not found
+        422 Exception if equipment being returned is not checked out
+    """
+
+    try:
+        return equipment_service.return_checkout(checkout, subject)
+    # if Equipment not found, raise 404 exception
+    except EquipmentCheckoutNotFoundException as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    # if other error, error was raised because equipment being returned is not checked out
+    except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
