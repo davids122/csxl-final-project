@@ -30,11 +30,5 @@ export class EquipmentCheckoutCard {
     }
   }
 
-  columnsToDisplay = [
-    'Name',
-    'Model',
-    'Equipment ID',
-    'Return Due Date',
-    'Action'
-  ];
+  columnsToDisplay = ['Name', 'Model', 'Equipment ID', 'Return Due Date'];
 }
