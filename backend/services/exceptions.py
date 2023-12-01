@@ -26,17 +26,4 @@ class OrganizationNotFoundException(Exception):
         super().__init__(f"No organization found matching slug/id: {id}")
 
 
-class EquipmentNotFoundException(Exception):
-    """EquipmentNotFoundException is raised when trying to access a piece of equipment that does not exist"""
 
-    def __init__(self, id: int):
-        super().__init__(f"No Equipment found matching equipment_id: {id}")
-
-
-class WaiverNotSignedException(Exception):
-    """WaiverNotSignedException is raised when a user tries to make an equipment checkout request before they have signed the liability waiver"""
-
-    def __init__(self):
-        super().__init__(
-            "You must sign the liability waiver before you can request an equipment checkout"
-        )

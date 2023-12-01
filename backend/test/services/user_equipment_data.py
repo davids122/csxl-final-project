@@ -9,7 +9,9 @@ from backend.entities.equipment_checkout_request_entity import (
     EquipmentCheckoutRequestEntity,
 )
 from backend.entities.permission_entity import PermissionEntity
+from backend.entities.staged_checkout_request_entity import StagedCheckoutRequestEntity
 from backend.entities.user_entity import UserEntity
+from backend.models.StagedCheckoutRequest import StagedCheckoutRequest
 from backend.models.equipment_checkout_request import EquipmentCheckoutRequest
 from datetime import datetime
 
@@ -123,6 +125,14 @@ checkout_request_arduino = EquipmentCheckoutRequest(
     user_name="Rhonda Root", model="Arduino Uno", pid=999999999
 )
 
+staged_checkout_request_quest_3 = StagedCheckoutRequest(
+    id=1, user_name="Sally Student", pid=111111111, selected_id=5, id_choices=[5]
+)
+
+staged_checkout_request_arduino = StagedCheckoutRequest(
+    id=2, user_name="Rhonda Root", pid=999999999, selected_id=2, id_choices=[2]
+)
+
 ambassador_permission_equipment = Permission(
     id=4, action="equipment.update", resource="equipment"
 )
@@ -229,6 +239,8 @@ equipment = [
 
 checkout_requests = [checkout_request_quest_3, checkout_request_arduino]
 
+staged_requests = [staged_checkout_request_quest_3, staged_checkout_request_arduino]
+
 checkouts = [
     equipment_checkout1,
     equipment_checkout2,
@@ -256,6 +268,14 @@ def insert_fake_data(session: Session):
         session.add(entity)
         request_entities.append(entity)
 
+    # Create entities for test stage request data
+    staged_entities = []
+    for item in staged_requests:
+        entity = StagedCheckoutRequestEntity.from_model(item)
+        session.add(entity)
+        staged_entities.append(entity)
+
+    # Create entities for test checkout dataa
     checkout_entities = []
     for item in checkouts:
         entity = EquipmentCheckoutEntity.from_model(item)
