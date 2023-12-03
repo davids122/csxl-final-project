@@ -69,6 +69,12 @@ export class AmbassadorEquipmentComponent implements OnInit {
     this.requestTable?.refreshTable();
   }
 
+  updateCheckoutTable() {
+    //updates the checkout table
+    this.equipmentCheckouts$ = this.equipmentService.get_all_active_checkouts();
+    this.checkoutTable?.refreshTable();
+  }
+
   approveRequest(request: CheckoutRequestModel) {
     // Remove the request from database table for checkin requests to prevent it from going back into check in request table on periodic update.
     this.cancelRequest(request);
@@ -128,5 +134,18 @@ export class AmbassadorEquipmentComponent implements OnInit {
         reduce((count) => count + 1, 1) // Starts with 0 and increments by 1 for each item
       )
       .subscribe((count) => (this.checkoutsLength = count));
+  }
+
+  returnEquipment(checkout: EquipmentCheckoutModel) {
+    // Calls proper API route to return an equipment checkout
+    this.equipmentService.returnCheckout(checkout).subscribe({
+      next: (value) => {
+        console.log('success');
+      },
+      error: (err) => console.log(err)
+    });
+
+    this.updateCheckoutTable();
+    this.checkoutTable?.refreshTable();
   }
 }

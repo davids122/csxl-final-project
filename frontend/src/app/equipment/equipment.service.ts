@@ -55,7 +55,6 @@ export class EquipmentService {
       model: modelName,
       pid: pid_value
     };
-    console.log(checkout_request);
     return this.http.post<CheckoutRequestModel>(
       '/api/equipment/add_request',
       checkout_request
@@ -160,6 +159,22 @@ export class EquipmentService {
   get_all_active_checkouts(): Observable<EquipmentCheckoutModel[]> {
     return this.http.get<EquipmentCheckoutModel[]>(
       '/api/equipment/get_all_active_checkouts'
+    );
+  }
+
+  /**
+   * Updates the checkout model to be inactive and corresponding equipment model in backend
+   *
+   * @returns Observable<EquipmentCheckoutModel[]>
+   */
+  returnCheckout(
+    checkout: EquipmentCheckoutModel
+  ): Observable<EquipmentCheckoutModel> {
+    console.log('return clicked');
+    console.log(checkout.model);
+    return this.http.put<EquipmentCheckoutModel>(
+      '/api/equipment/return_checkout',
+      checkout
     );
   }
 }

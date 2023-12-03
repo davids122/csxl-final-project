@@ -20,6 +20,7 @@ import { EquipmentCheckoutModel } from '../../equipment-checkout.model';
 })
 export class EquipmentCheckoutCard {
   @Input() checkouts!: Observable<EquipmentCheckoutModel[]>;
+  @Output() returnEquipment = new EventEmitter<EquipmentCheckoutModel>();
 
   @ViewChild(MatTable) table: MatTable<any> | undefined;
 
@@ -30,5 +31,15 @@ export class EquipmentCheckoutCard {
     }
   }
 
-  columnsToDisplay = ['Name', 'Model', 'Equipment ID', 'Return Due Date'];
+  onreturn() {
+    console.log('clicked');
+  }
+
+  columnsToDisplay = [
+    'Name',
+    'Model',
+    'Equipment ID',
+    'Return Due Date',
+    'Action'
+  ];
 }
