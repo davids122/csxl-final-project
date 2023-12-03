@@ -9,6 +9,7 @@ import { WaiverComponent } from './waiver/waiver.component';
 import { EquipmentCard } from './widgets/equipment-card/equipment-card.widget';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
+import { MatTabsModule } from '@angular/material/tabs';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
@@ -46,7 +47,8 @@ import { EquipmentCheckoutCard } from './widgets/equipment-checkout-card/equipme
     MatFormFieldModule,
     MatInputModule,
     MatTableModule,
-    MatSelectModule
+    MatSelectModule,
+    MatTabsModule
   ]
 })
 export class EquipmentModule {}
