@@ -2,8 +2,18 @@
   <mat-card-header>
     <mat-card-title>{{ equipmentType.model }}</mat-card-title>
     <mat-card-subtitle
-      >{{ equipmentType.num_available }} available</mat-card-subtitle
-    >
+      class="available"
+      *ngIf="equipmentType.num_available > 0; else none"
+      ><span class="badge">
+        {{ equipmentType.num_available }} available</span
+      ></mat-card-subtitle
+    ><ng-template #none>
+      <mat-card-subtitle class="none"
+        ><span class="badge">
+          {{ equipmentType.num_available }} available</span
+        ></mat-card-subtitle
+      >
+    </ng-template>
   </mat-card-header>
   <div class="card-content">
     <div class="card-image-container">
