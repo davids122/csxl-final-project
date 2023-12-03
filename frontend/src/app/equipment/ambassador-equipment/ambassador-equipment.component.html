@@ -42,7 +42,8 @@
     <div>
       <equipment-checkout-card
         *ngIf="checkoutsLength && checkoutsLength >= 1; else noCheckouts"
-        [checkouts]="equipmentCheckouts$" />
+        [checkouts]="equipmentCheckouts$"
+        (returnEquipment)="returnEquipment($event)" />
       <ng-template #noCheckouts>
         <mat-card class="content" appearance="outlined">
           <mat-card-header>
