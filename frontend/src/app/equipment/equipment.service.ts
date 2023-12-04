@@ -6,6 +6,7 @@ import { EquipmentType } from './equipmentType.model';
 import { Profile, ProfileService } from '../profile/profile.service';
 import { CheckoutRequestModel } from './checkoutRequest.model';
 import { EquipmentCheckoutModel } from './equipment-checkout.model';
+import { StagedCheckoutRequestModel } from './staged-checkout-request.model';
 @Injectable({
   providedIn: 'root'
 })
@@ -91,16 +92,19 @@ export class EquipmentService {
   }
 
   /**
-   * Approve a checkout request
-   * @param user, checkout request obtject
+   * Approve a checkout request by adding corresponding staged request into backend
+   * @param stagedRequest, staged request object created in ambassador component ts
    * @returns checkout request object
    */
-  approveRequest(request: CheckoutRequestModel) {
-    console.log('Approved');
+  approveRequest(stagedRequest: StagedCheckoutRequestModel) {
+    return this.http.post<StagedCheckoutRequestModel>(
+      'api/equipment/create_staged_request',
+      stagedRequest
+    );
   }
 
   /**
-   * Retrieve all Equipment of a specific model type
+   * Retrieve all Equipment of a specific model type that is not currently checkout out
    * @param model of the equipment to be retrieved
    * @returns list of equipment
    */
@@ -127,19 +131,16 @@ export class EquipmentService {
    * @returns Observable<EquipmentCheckoutModel>
    */
   create_checkout(
-    user_name: String,
-    pid: Number,
-    equipment_id: Number,
-    model: String
+    stagedCheckoutRequestModel: StagedCheckoutRequestModel
   ): Observable<EquipmentCheckoutModel> {
     let currentDate = new Date();
     let threeDaysLater = new Date(currentDate);
     threeDaysLater.setDate(currentDate.getDate() + 3);
     let checkout = {
-      user_name: user_name,
-      pid: pid,
-      equipment_id: equipment_id,
-      model: model,
+      user_name: stagedCheckoutRequestModel.user_name,
+      pid: stagedCheckoutRequestModel.pid,
+      equipment_id: stagedCheckoutRequestModel.selected_id,
+      model: stagedCheckoutRequestModel.model,
       is_active: true,
       started_at: currentDate,
       end_at: threeDaysLater
@@ -175,6 +176,25 @@ export class EquipmentService {
     return this.http.put<EquipmentCheckoutModel>(
       '/api/equipment/return_checkout',
       checkout
+    );
+  }
+
+  getAllStagedCheckouts(): Observable<StagedCheckoutRequestModel[]> {
+    return this.http.get<StagedCheckoutRequestModel[]>(
+      'api/equipment/get_all_staged_requests'
+    );
+  }
+
+  removeStagedCheckout(stagedCheckout: StagedCheckoutRequestModel) {
+    //formatting for delete request data
+    const options = {
+      headers: new HttpHeaders(),
+      body: stagedCheckout // Here you put the body data
+    };
+    //make the api call
+    return this.http.delete<StagedCheckoutRequestModel>(
+      '/api/equipment/delete_staged_request',
+      options
     );
   }
 }

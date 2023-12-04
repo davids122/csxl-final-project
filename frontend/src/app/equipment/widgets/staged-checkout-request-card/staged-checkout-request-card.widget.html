@@ -3,7 +3,7 @@
     <mat-card-header>
       <mat-card-title> Staged Checkout Requests </mat-card-title>
     </mat-card-header>
-    <table mat-table [dataSource]="checkoutRequests">
+    <table mat-table [dataSource]="stagedCheckoutRequests">
       <!--Column to hold the name of the user submitting the request.-->
       <ng-container matColumnDef="Name">
         <th mat-header-cell *matHeaderCellDef>Name</th>
@@ -38,13 +38,13 @@
           <button
             mat-stroked-button
             color="primary"
-            (click)="approveRequest.emit(request)">
+            (click)="approveStagedRequest.emit(request)">
             Approve
           </button>
           <button
             mat-stroked-button
             color="warn"
-            (click)="cancelRequest(request)">
+            (click)="cancelStagedRequest.emit(request)">
             Cancel
           </button>
         </td>

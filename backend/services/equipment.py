@@ -61,6 +61,7 @@ class EquipmentCheckoutNotFoundException(Exception):
             f"Could not find active checkout for equipment item with id: {id}"
         )
 
+
 class EquipmentNotFoundException(Exception):
     """EquipmentNotFoundException is raised when trying to access a piece of equipment that does not exist"""
 
@@ -76,11 +77,13 @@ class WaiverNotSignedException(Exception):
             "You must sign the liability waiver before you can request an equipment checkout"
         )
 
+
 class StagedCheckoutRequestNotFoundException(Exception):
     """StagedCheckoutRequestNotFoundException is raised when a user tries to access a staged checkout request that does not exist"""
 
     def __init__(self, request: StagedCheckoutRequest):
         super().__init__(f"Could not find staged checkout request: {request}")
+
 
 class EquipmentService:
     """Service that performs all of the actions on the equipment table."""
@@ -346,9 +349,7 @@ class EquipmentService:
         """Return a list of all staged checkout requests in the db"""
 
         # enforce ambasssador permission
-        self._permission.enforce(
-            subject, "equipment.get_all_staged_requests", resource="equipment"
-        )
+        self._permission.enforce(subject, "equipment.update", resource="equipment")
 
         # create the query for getting all equipment checkout request entities.
         query = select(StagedCheckoutRequestEntity)
@@ -356,17 +357,25 @@ class EquipmentService:
         query_result = self._session.scalars(query).all()
         # convert the query results into 'EquipmentReservationRequest' models and return as a list
         return [result.to_model() for result in query_result]
-    
-    def create_staged_request(self, subject: User, staged_request: StagedCheckoutRequest) -> StagedCheckoutRequest:
+
+    def create_staged_request(
+        self, subject: User, staged_request: StagedCheckoutRequest
+    ) -> StagedCheckoutRequest:
         """Create a staged checkout request"""
 
         # enforce ambasssador permission
-        self._permission.enforce(
-            subject, "equipment.create_staged_request", resource="equipment"
-        )
+        self._permission.enforce(subject, "equipment.update", resource="equipment")
+
+        # set id_choices field to ids of available equipment
+        staged_request.id_choices = [
+            eq.equipment_id
+            for eq in self.get_equipment_for_request(subject, staged_request.model)
+        ]
 
         # create new object
-        staged_checkout_request_entity = StagedCheckoutRequestEntity.from_model(staged_request)
+        staged_checkout_request_entity = StagedCheckoutRequestEntity.from_model(
+            staged_request
+        )
 
         # add new object to table and commit changes
         self._session.add(staged_checkout_request_entity)
@@ -374,18 +383,25 @@ class EquipmentService:
 
         # return added object
         return staged_checkout_request_entity.to_model()
-    
-    def delete_staged_request(self, subject: User, staged_request: StagedCheckoutRequest) -> None:
+
+    def delete_staged_request(
+        self, subject: User, staged_request: StagedCheckoutRequest
+    ) -> None:
         """Delete a staged checkout request"""
 
         # enforce ambasssador permission
-        self._permission.enforce(
-            subject, "equipment.delete_staged_request", resource="equipment"
-        )
+        self._permission.enforce(subject, "equipment.update", resource="equipment")
 
         # find stage request entity to delete
-        staged_entity = self._session.query(StagedCheckoutRequestEntity).filter(StagedCheckoutRequestEntity.id == staged_request.id,).one_or_none()
-        
+        staged_entity = (
+            self._session.query(StagedCheckoutRequestEntity)
+            .filter(
+                StagedCheckoutRequestEntity.pid == staged_request.pid,
+                StagedCheckoutRequestEntity.model == staged_request.model,
+            )
+            .one_or_none()
+        )
+
         if staged_entity:
             # delete entity from db and commit changes
             self._session.delete(staged_entity)
@@ -393,7 +409,7 @@ class EquipmentService:
         else:
             # raise exception
             raise StagedCheckoutRequestNotFoundException(staged_request)
-    
+
     def get_all_active_checkouts(self, subject: User) -> list[EquipmentCheckout]:
         """
         Gets all checkouts that are "active" i.e. that item is currently checked out

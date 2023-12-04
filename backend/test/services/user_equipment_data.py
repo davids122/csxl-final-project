@@ -126,11 +126,11 @@ checkout_request_arduino = EquipmentCheckoutRequest(
 )
 
 staged_checkout_request_quest_3 = StagedCheckoutRequest(
-    id=1, user_name="Sally Student", pid=111111111, selected_id=5, id_choices=[5]
+    user_name="Sally Student", model="Meta Quest 3", pid=111111111, id_choices=[5]
 )
 
 staged_checkout_request_arduino = StagedCheckoutRequest(
-    id=2, user_name="Rhonda Root", pid=999999999, selected_id=2, id_choices=[2]
+    user_name="Rhonda Root", model="Arduino Uno", pid=999999999, id_choices=[2]
 )
 
 ambassador_permission_equipment = Permission(

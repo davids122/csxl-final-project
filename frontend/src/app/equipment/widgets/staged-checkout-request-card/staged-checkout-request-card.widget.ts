@@ -14,6 +14,7 @@ import { Router } from '@angular/router';
 import { CheckoutRequestModel } from '../../checkoutRequest.model';
 import { StagedCheckoutRequestModel } from '../../staged-checkout-request.model';
 import { MatTable } from '@angular/material/table';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'staged-checkout-request-card',
@@ -21,8 +22,11 @@ import { MatTable } from '@angular/material/table';
   styleUrls: ['./staged-checkout-request-card.widget.css']
 })
 export class StageCard {
-  @Input() checkoutRequests!: StagedCheckoutRequestModel[];
-  @Output() approveRequest = new EventEmitter<StagedCheckoutRequestModel>();
+  @Input() stagedCheckoutRequests!: Observable<StagedCheckoutRequestModel[]>;
+  @Output() approveStagedRequest =
+    new EventEmitter<StagedCheckoutRequestModel>();
+  @Output() cancelStagedRequest =
+    new EventEmitter<StagedCheckoutRequestModel>();
 
   @ViewChild(MatTable) table: MatTable<any> | undefined;
 
@@ -38,20 +42,7 @@ export class StageCard {
   }
 
   // Set selected id for given staged request when the ambassador selects an id.
-  idSelectionChange(id: Number, request: StagedCheckoutRequestModel) {
-    this.checkoutRequests.forEach((req) => {
-      if (req.model == request.model && req.pid == request.pid) {
-        req.selected_id = id;
-      }
-    });
-  }
-
-  // Remove the request from checkoutRequests array.
-  cancelRequest(request: StagedCheckoutRequestModel) {
-    this.checkoutRequests = this.checkoutRequests.filter(
-      (req) => req.pid != request.pid || req.model != request.model
-    );
-    this.table?.renderRows();
-    console.log(this.table);
+  idSelectionChange(id: Number, stagedRequest: StagedCheckoutRequestModel) {
+    stagedRequest.selected_id = id;
   }
 }
