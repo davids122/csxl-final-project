@@ -158,27 +158,22 @@ export class AmbassadorEquipmentComponent implements OnInit {
 
   // Gets the length of the observable array of checkout request models.
   getCheckoutRequestLength() {
-    this.checkoutRequests$
-      .pipe(
-        reduce((count) => count + 1, 1) // Starts with 0 and increments by 1 for each item
-      )
-      .subscribe((count) => (this.checkoutRequestsLength = count));
+    this.checkoutRequests$.subscribe((array) => {
+      this.checkoutRequestsLength = array.length;
+    });
   }
 
+  //Gets the length of the observable array of staged checkout request models
   getStagedCheckoutLength() {
-    this.stagedCheckoutRequests$
-      .pipe(
-        reduce((count) => count + 1, 1) // Starts with 0 and increments by 1 for each item
-      )
-      .subscribe((count) => (this.stagedCheckoutRequestsLength = count));
+    this.stagedCheckoutRequests$.subscribe((array) => {
+      this.stagedCheckoutRequestsLength = array.length;
+    });
   }
-
+  //Gets the length of the observable array of checkout models
   getCheckoutsLength() {
-    this.equipmentCheckouts$
-      .pipe(
-        reduce((count) => count + 1, 1) // Starts with 0 and increments by 1 for each item
-      )
-      .subscribe((count) => (this.checkoutsLength = count));
+    this.equipmentCheckouts$.subscribe((array) => {
+      this.checkoutsLength = array.length;
+    });
   }
 
   returnEquipment(checkout: EquipmentCheckoutModel) {

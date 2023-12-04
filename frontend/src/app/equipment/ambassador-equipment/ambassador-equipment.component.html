@@ -20,16 +20,16 @@
       </ng-template>
     </div>
 
-<div>
-  <staged-checkout-request-card
-    *ngIf="
-      stagedCheckoutRequestsLength && checkoutRequestsLength >= 1;
-      else noStagedRequests
-    "
-    [stagedCheckoutRequests]="stagedCheckoutRequests$"
-    (approveStagedRequest)="approveStagedRequest($event)"
-    (cancelStagedRequest)="cancelStagedRequest($event)" />
-  
+    <div>
+      <staged-checkout-request-card
+        *ngIf="
+          stagedCheckoutRequestsLength && stagedCheckoutRequestsLength >= 1;
+          else noStagedRequests
+        "
+        [stagedCheckoutRequests]="stagedCheckoutRequests$"
+        (approveStagedRequest)="approveStagedRequest($event)"
+        (cancelStagedRequest)="cancelStagedRequest($event)" />
+
       <ng-template #noStagedRequests>
         <mat-card class="content" appearance="outlined">
           <mat-card-header>
