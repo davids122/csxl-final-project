@@ -4,7 +4,7 @@ import { permissionGuard } from 'src/app/permission.guard';
 import { profileResolver } from 'src/app/profile/profile.resolver';
 import { EquipmentService } from '../equipment.service';
 import { CheckoutRequestModel } from '../checkoutRequest.model';
-import { Observable, reduce, tap, timer } from 'rxjs';
+import { Observable, map, reduce, tap, timer } from 'rxjs';
 import { StagedCheckoutRequestModel } from '../staged-checkout-request.model';
 import { StageCard } from '../widgets/staged-checkout-request-card/staged-checkout-request-card.widget';
 import { CheckoutRequestCard } from '../widgets/checkout-request-card/checkout-request-card.widget';
@@ -47,7 +47,14 @@ export class AmbassadorEquipmentComponent implements OnInit {
     this.getCheckoutRequestLength();
     this.stagedCheckoutRequests$ = equipmentService.getAllStagedCheckouts();
     this.getStagedCheckoutLength();
-    this.equipmentCheckouts$ = equipmentService.get_all_active_checkouts();
+    this.equipmentCheckouts$ = equipmentService.get_all_active_checkouts().pipe(
+      map((checkouts) => {
+        checkouts.forEach((checkout) => {
+          checkout.end_at = new Date(checkout.end_at);
+        });
+        return checkouts;
+      })
+    );
     this.getCheckoutsLength();
     this.stagedCheckoutRequests$.subscribe({
       next: (value) => {
@@ -87,7 +94,16 @@ export class AmbassadorEquipmentComponent implements OnInit {
 
   updateCheckoutTable() {
     //updates the checkout table
-    this.equipmentCheckouts$ = this.equipmentService.get_all_active_checkouts();
+    this.equipmentCheckouts$ = this.equipmentService
+      .get_all_active_checkouts()
+      .pipe(
+        map((checkouts) => {
+          checkouts.forEach((checkout) => {
+            checkout.end_at = new Date(checkout.end_at);
+          });
+          return checkouts;
+        })
+      );
     this.getCheckoutsLength();
     this.checkoutTable?.refreshTable();
   }
