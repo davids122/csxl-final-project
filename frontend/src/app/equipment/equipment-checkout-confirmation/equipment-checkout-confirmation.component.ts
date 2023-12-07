@@ -10,6 +10,7 @@ import { CheckoutRequestModel } from '../checkoutRequest.model';
   styleUrls: ['./equipment-checkout-confirmation.component.css']
 })
 export class EquipmentCheckoutConfirmationComponent {
+  /** Route information to be used in App Routing Module */
   public static Route = {
     path: 'checkout',
     title: 'Checkout Confirmation',

@@ -26,7 +26,6 @@ export class WaiverComponent {
   };
 
   private profile: Profile | undefined;
-  private profileSubscription!: Subscription;
 
   //Used to check to see if signature field is not empty
   formControl = new FormControl('', [Validators.required]);
@@ -37,9 +36,7 @@ export class WaiverComponent {
     private profileSvc: ProfileService,
     public router: Router
   ) {
-    this.profileSubscription = this.profileSvc.profile$.subscribe(
-      (profile) => (this.profile = profile)
-    );
+    this.profileSvc.profile$.subscribe((profile) => (this.profile = profile));
   }
 
   // after agree to terms is clicked on waiver, update waiver field and route to equipment checkout component

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, map } from 'rxjs';
 import { Equipment } from './equipment.model';
 import { EquipmentType } from './equipmentType.model';
 import { Profile, ProfileService } from '../profile/profile.service';
@@ -23,13 +23,6 @@ export class EquipmentService {
     );
   }
 
-  /** Returns all equipment entries from backend database table using backend HTTP get request
-   * @returns {Observable<Equipment[]>}
-   */
-  getAllEquipment(): Observable<Equipment[]> {
-    return this.http.get<Equipment[]>('/api/equipment/get_all');
-  }
-
   /** Returns all equipmentType objects from backend method using HTTP get request.
    * @returns {Observable<EquipmentType[]>}
    */
@@ -39,8 +32,8 @@ export class EquipmentService {
 
   /**
    * Creates a checkout request and adds it to backend database.
-   * @param user, equipmentCheckoutRequest
-   * @return equipmentCheckoutRequest
+   * @param equipmentType: equipment type that checkout reqeust needs to be created for
+   * @returns {Observable<CheckoutRequestModel>}
    * @throws WaiverNotSigned exception if user has not signed waiver.
    */
   addRequest(equipmentType: EquipmentType): Observable<CheckoutRequestModel> {
@@ -64,7 +57,7 @@ export class EquipmentService {
 
   /**
    * Delete a checkout request. Ambassador permissions required for this function.
-   * @param user, equipmentCheckoutRequest
+   * @param request: CheckoutRequestModel that needs to be deleted
    * @returns None
    */
   deleteRequest(request: CheckoutRequestModel) {
@@ -82,7 +75,6 @@ export class EquipmentService {
 
   /**
    * Get all checkout requests
-   * @param None
    * @returns Observable<CheckoutRequestModels[]>
    */
   getAllRequest(): Observable<CheckoutRequestModel[]> {
@@ -93,8 +85,8 @@ export class EquipmentService {
 
   /**
    * Approve a checkout request by adding corresponding staged request into backend
-   * @param stagedRequest, staged request object created in ambassador component ts
-   * @returns checkout request object
+   * @param stagedRequest: StagedCheckoutRequestModel that needs to be approved
+   * @returns {StagedCheckoutRequestModel}
    */
   approveRequest(stagedRequest: StagedCheckoutRequestModel) {
     return this.http.post<StagedCheckoutRequestModel>(
@@ -106,7 +98,7 @@ export class EquipmentService {
   /**
    * Retrieve all Equipment of a specific model type that is not currently checkout out
    * @param model of the equipment to be retrieved
-   * @returns list of equipment
+   * @returns {Observable<Equipment[]>}
    */
   getAllEquipmentByModel(model: String): Observable<Equipment[]> {
     return this.http.get<Equipment[]>(
@@ -114,9 +106,8 @@ export class EquipmentService {
     );
   }
 
-  /* * Update waiver_signed field for current user
-   *
-   * @returns Observable<Profile>
+  /** Update waiver_signed field for current user
+   * @returns {Observable<Profile>}
    */
   update_waiver_field(): Observable<Profile> {
     return this.http.put<Profile>(
@@ -126,9 +117,53 @@ export class EquipmentService {
   }
 
   /**
+   * Get all staged checkouts from backend
+   * @returns {Observable<StagedCheckoutRequestModel[]>}
+   */
+  getAllStagedCheckouts(): Observable<StagedCheckoutRequestModel[]> {
+    return this.http.get<StagedCheckoutRequestModel[]>(
+      'api/equipment/get_all_staged_requests'
+    );
+  }
+
+  /**
+   * Get all active Equipment checkout models from backend and maps end_at date
+   * @param stagedCheckout: staged checkout that needs to be removed
+   * @returns {Observable<StagedCheckoutRequest[]>}
+   */
+  removeStagedCheckout(stagedCheckout: StagedCheckoutRequestModel) {
+    const options = {
+      headers: new HttpHeaders(),
+      body: stagedCheckout
+    };
+    return this.http.delete<StagedCheckoutRequestModel>(
+      '/api/equipment/delete_staged_request',
+      options
+    );
+  }
+
+  /**
+   * Get all active Equipment checkout models from backend and maps end_at date
+   * @returns {Observable<EquipmentCheckoutModel[]>}
+   */
+  get_all_active_checkouts(): Observable<EquipmentCheckoutModel[]> {
+    return this.http
+      .get<EquipmentCheckoutModel[]>('/api/equipment/get_all_active_checkouts')
+      .pipe(
+        // Maps the end_at date retrieved from backend to be a new date object for each checkout
+        map((checkouts) => {
+          checkouts.forEach((checkout) => {
+            checkout.end_at = new Date(checkout.end_at);
+          });
+          return checkouts;
+        })
+      );
+  }
+
+  /**
    * Create new equipmentCheckout model and post to backend
-   * @param user_name, pid, equipment_id, model
-   * @returns Observable<EquipmentCheckoutModel>
+   * @param stagedCheckoutRequestModel: staged checkout to be added to backend
+   * @returns {Observable<EquipmentCheckoutModel>}
    */
   create_checkout(
     stagedCheckoutRequestModel: StagedCheckoutRequestModel
@@ -136,6 +171,7 @@ export class EquipmentService {
     let currentDate = new Date();
     let threeDaysLater = new Date(currentDate);
     threeDaysLater.setDate(currentDate.getDate() + 3);
+
     let checkout = {
       user_name: stagedCheckoutRequestModel.user_name,
       pid: stagedCheckoutRequestModel.pid,
@@ -153,48 +189,16 @@ export class EquipmentService {
   }
 
   /**
-   * Get all active Equipment checkout models from backend
-   *
-   * @returns Observable<EquipmentCheckoutModel[]>
-   */
-  get_all_active_checkouts(): Observable<EquipmentCheckoutModel[]> {
-    return this.http.get<EquipmentCheckoutModel[]>(
-      '/api/equipment/get_all_active_checkouts'
-    );
-  }
-
-  /**
-   * Updates the checkout model to be inactive and corresponding equipment model in backend
-   *
-   * @returns Observable<EquipmentCheckoutModel[]>
+   * Updates the checkout model to be inactive and updates is_checked_out field of corresponding equipment model in backend
+   * @param checkout: EquipmentCheckoutModel to be returned
+   * @returns {Observable<EquipmentCheckoutModel>}
    */
   returnCheckout(
     checkout: EquipmentCheckoutModel
   ): Observable<EquipmentCheckoutModel> {
-    console.log('return clicked');
-    console.log(checkout.model);
     return this.http.put<EquipmentCheckoutModel>(
       '/api/equipment/return_checkout',
       checkout
-    );
-  }
-
-  getAllStagedCheckouts(): Observable<StagedCheckoutRequestModel[]> {
-    return this.http.get<StagedCheckoutRequestModel[]>(
-      'api/equipment/get_all_staged_requests'
-    );
-  }
-
-  removeStagedCheckout(stagedCheckout: StagedCheckoutRequestModel) {
-    //formatting for delete request data
-    const options = {
-      headers: new HttpHeaders(),
-      body: stagedCheckout // Here you put the body data
-    };
-    //make the api call
-    return this.http.delete<StagedCheckoutRequestModel>(
-      '/api/equipment/delete_staged_request',
-      options
     );
   }
 }

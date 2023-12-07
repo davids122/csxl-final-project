@@ -31,10 +31,6 @@ export class EquipmentCheckoutCard {
     }
   }
 
-  onreturn() {
-    console.log('clicked');
-  }
-
   columnsToDisplay = [
     'Name',
     'Model',

@@ -3,6 +3,8 @@
     <mat-card-header>
       <mat-card-title> Current Equipment Checkouts </mat-card-title>
     </mat-card-header>
+
+    <!-- Table to display all of active equipment checkouts -->
     <table mat-table [dataSource]="checkouts">
       <!--Column to hold the name of the user that has the equipment checked out.-->
       <ng-container matColumnDef="Name">

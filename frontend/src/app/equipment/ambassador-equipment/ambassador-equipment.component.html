@@ -1,6 +1,7 @@
 <mat-tab-group>
   <mat-tab label="Checkout Requests">
-    <div class="checkout-request-container">
+    <!-- Table to display checkout requests -->
+    <div>
       <checkout-request-card
         *ngIf="
           checkoutRequestsLength && checkoutRequestsLength >= 1;
@@ -10,6 +11,7 @@
         (approveRequest)="approveRequest($event)"
         (cancelRequest)="cancelRequest($event)" />
 
+      <!-- Template for when there are no checkout requests -->
       <ng-template #noUpcoming>
         <mat-card class="content" appearance="outlined">
           <mat-card-header>
@@ -20,6 +22,7 @@
       </ng-template>
     </div>
 
+    <!-- Table to display staged requests -->
     <div>
       <staged-checkout-request-card
         *ngIf="
@@ -30,6 +33,7 @@
         (approveStagedRequest)="approveStagedRequest($event)"
         (cancelStagedRequest)="cancelStagedRequest($event)" />
 
+      <!-- Template for when there are no staged requests -->
       <ng-template #noStagedRequests>
         <mat-card class="content" appearance="outlined">
           <mat-card-header>
@@ -42,12 +46,16 @@
       </ng-template>
     </div>
   </mat-tab>
+
   <mat-tab label="Current Checkouts">
+    <!-- Table to display checkouts -->
     <div>
       <equipment-checkout-card
         *ngIf="checkoutsLength && checkoutsLength >= 1; else noCheckouts"
         [checkouts]="equipmentCheckouts$"
         (returnEquipment)="returnEquipment($event)" />
+
+      <!-- Template for when there are no checkouts -->
       <ng-template #noCheckouts>
         <mat-card class="content" appearance="outlined">
           <mat-card-header>

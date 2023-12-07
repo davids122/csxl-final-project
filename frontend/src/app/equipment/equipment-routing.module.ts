@@ -4,6 +4,8 @@ import { UserEquipmentComponent } from './user-equipment/user-equipment.componen
 import { WaiverComponent } from './waiver/waiver.component';
 import { EquipmentCheckoutConfirmationComponent } from './equipment-checkout-confirmation/equipment-checkout-confirmation.component';
 import { AmbassadorEquipmentComponent } from './ambassador-equipment/ambassador-equipment.component';
+
+// Routes for all components in equipment feature
 const routes: Routes = [
   UserEquipmentComponent.Route,
   WaiverComponent.Route,
