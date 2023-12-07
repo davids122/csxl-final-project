@@ -23,7 +23,7 @@ export class AmbassadorEquipmentComponent implements OnInit {
     path: 'ambassador',
     component: AmbassadorEquipmentComponent,
     title: 'XL Equipment',
-    canActivate: [permissionGuard('equipment.update', 'equipment')],
+    canActivate: [permissionGuard('equipment.view.checkout', 'equipment')],
     resolve: { profile: profileResolver }
   };
 

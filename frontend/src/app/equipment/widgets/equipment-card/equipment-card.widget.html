@@ -24,6 +24,11 @@
     </div>
   </div>
   <mat-card-actions class="card-actions">
-    <button mat-button (click)="onCheckout()">Checkout</button>
+    <button
+      mat-button
+      (click)="onCheckout()"
+      [disabled]="equipmentType.num_available === 0">
+      Checkout
+    </button>
   </mat-card-actions>
 </mat-card>
