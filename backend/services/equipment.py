@@ -36,7 +36,9 @@ class DuplicateEquipmentCheckoutRequestException(Exception):
     """DuplicateEquipmentCheckoutRequestException is raised when a user tries to make a second checkout request for the same equipment type"""
 
     def __init__(self, model: str):
-        super().__init__(f"User has already requested a checkout for {model}")
+        super().__init__(
+            f"You already have an active checkout or checkout request for {model}"
+        )
 
 
 class EquipmentCheckoutRequestNotFoundException(Exception):
@@ -245,28 +247,29 @@ class EquipmentService:
             .one_or_none()
         )
 
-        # Check if the user has already submitted a staged request for the same type of equipment. 
+        # Check if the user has already submitted a staged request for the same type of equipment.
         priorStagedRequest = (
             self._session.query(StagedCheckoutRequestEntity)
             .filter(
                 StagedCheckoutRequestEntity.model == request.model,
-                StagedCheckoutRequestEntity.pid == request.pid
+                StagedCheckoutRequestEntity.pid == request.pid,
             )
             .one_or_none()
         )
 
-        # Check if the user already has a checkout. 
+        # Check if the user already has a checkout.
         priorCheckout = (
             self._session.query(EquipmentCheckoutEntity)
             .filter(
                 EquipmentCheckoutEntity.model == request.model,
-                EquipmentCheckoutEntity.pid == request.pid
+                EquipmentCheckoutEntity.pid == request.pid,
+                EquipmentCheckoutEntity.is_active,
             )
             .one_or_none()
         )
 
         # if the user is trying to send a duplicate request, raise exception
-        if priorCheckoutRequest or priorStagedRequest or priorCheckout: 
+        if priorCheckoutRequest or priorStagedRequest or priorCheckout:
             raise DuplicateEquipmentCheckoutRequestException(request.model)
 
         # create new object
@@ -363,7 +366,9 @@ class EquipmentService:
         """Return a list of all staged checkout requests in the db"""
 
         # enforce ambasssador permission
-        self._permission.enforce(subject, "equipment.view.checkout", resource="equipment")
+        self._permission.enforce(
+            subject, "equipment.view.checkout", resource="equipment"
+        )
 
         # create the query for getting all equipment checkout request entities.
         query = select(StagedCheckoutRequestEntity)
@@ -378,7 +383,9 @@ class EquipmentService:
         """Create a staged checkout request"""
 
         # enforce ambasssador permission
-        self._permission.enforce(subject, "equipment.crud.checkout", resource="equipment")
+        self._permission.enforce(
+            subject, "equipment.crud.checkout", resource="equipment"
+        )
 
         # set id_choices field to ids of available equipment
         staged_request.id_choices = [
@@ -404,7 +411,9 @@ class EquipmentService:
         """Delete a staged checkout request"""
 
         # enforce ambasssador permission
-        self._permission.enforce(subject, "equipment.crud.checkout", resource="equipment")
+        self._permission.enforce(
+            subject, "equipment.crud.checkout", resource="equipment"
+        )
 
         # find stage request entity to delete
         staged_entity = (
@@ -431,9 +440,7 @@ class EquipmentService:
         Returns:
             An array of all EquipmentCheckouts, as models, that are "active"
         """
-        self._permission.enforce(
-            subject, "equipment.view.checkout", "equipment"
-        )
+        self._permission.enforce(subject, "equipment.view.checkout", "equipment")
         # Create the query for getting all equipment checkout entities.
         query = select(EquipmentCheckoutEntity).where(
             EquipmentCheckoutEntity.is_active == True
