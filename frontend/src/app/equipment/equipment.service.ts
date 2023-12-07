@@ -88,7 +88,27 @@ export class EquipmentService {
    * @param stagedRequest: StagedCheckoutRequestModel that needs to be approved
    * @returns {StagedCheckoutRequestModel}
    */
-  approveRequest(stagedRequest: StagedCheckoutRequestModel) {
+  approveRequest(request: CheckoutRequestModel) {
+    let id_choices: Number[] = [];
+    let equipment_list = this.getAllEquipmentByModel(request.model);
+    equipment_list.subscribe({
+      next(equipment_arr) {
+        equipment_arr.forEach((item) => {
+          id_choices?.push(item.equipment_id);
+        });
+      }
+    });
+    let user_name = request.user_name;
+    let model = request.model;
+    let pid = request.pid;
+    let stagedRequest: StagedCheckoutRequestModel = {
+      user_name: user_name,
+      model: model,
+      id_choices: id_choices,
+      selected_id: null,
+      pid: pid
+    };
+
     return this.http.post<StagedCheckoutRequestModel>(
       'api/equipment/create_staged_request',
       stagedRequest

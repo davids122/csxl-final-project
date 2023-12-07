@@ -11,6 +11,7 @@ import { CheckoutRequestCard } from '../widgets/checkout-request-card/checkout-r
 import { EquipmentCheckoutCard } from '../widgets/equipment-checkout-card/equipment-checkout-card.widget';
 import { EquipmentCheckoutConfirmationComponent } from '../equipment-checkout-confirmation/equipment-checkout-confirmation.component';
 import { EquipmentCheckoutModel } from '../equipment-checkout.model';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-ambassador-equipment',
@@ -42,7 +43,8 @@ export class AmbassadorEquipmentComponent implements OnInit {
 
   constructor(
     public router: Router,
-    private equipmentService: EquipmentService
+    private equipmentService: EquipmentService,
+    protected snackBar: MatSnackBar
   ) {
     this.checkoutRequests$ = equipmentService.getAllRequest();
     this.setCheckoutRequestsLength();
@@ -85,34 +87,13 @@ export class AmbassadorEquipmentComponent implements OnInit {
     this.checkoutTable?.refreshTable();
   }
 
-  // TODO: move logic into service
   approveRequest(request: CheckoutRequestModel) {
     // Convert request into staged request.
-    let id_choices: Number[] = [];
-    let equipment_list = this.equipmentService.getAllEquipmentByModel(
-      request.model
-    );
-    equipment_list.subscribe({
-      next(equipment_arr) {
-        equipment_arr.forEach((item) => {
-          id_choices?.push(item.equipment_id);
-        });
-      }
-    });
-    let user_name = request.user_name;
-    let model = request.model;
-    let selected_id = undefined;
-    let pid = request.pid;
-    let stagedRequest: StagedCheckoutRequestModel = {
-      user_name: user_name,
-      model: model,
-      id_choices: id_choices,
-      selected_id: null,
-      pid: pid
-    };
-    this.equipmentService.approveRequest(stagedRequest).subscribe({
+    this.equipmentService.approveRequest(request).subscribe({
       next: () => {
-        this.cancelRequest(request);
+        this.equipmentService
+          .deleteRequest(request)
+          .subscribe(() => this.updateCheckoutRequestsTable());
         this.updateStagedCheckoutTable();
         this.updateCheckoutRequestsTable();
       },
@@ -127,6 +108,12 @@ export class AmbassadorEquipmentComponent implements OnInit {
     this.equipmentService
       .deleteRequest(request)
       .subscribe(() => this.updateCheckoutRequestsTable());
+
+    this.snackBar.open(
+      `Canceled checkout request of ${request.model} by ${request.user_name}`,
+      '',
+      { duration: 4000 }
+    );
   }
 
   // Approves a staged checkout calling service method; if successful, cancels the staged request and rerenders checkouts table
@@ -136,6 +123,11 @@ export class AmbassadorEquipmentComponent implements OnInit {
       next: (value) => {
         this.cancelStagedRequest(request);
         this.updateCheckoutTable();
+        this.snackBar.open(
+          `${request.user_name} has checked out one ${request.model}`,
+          '',
+          { duration: 4000 }
+        );
       },
       error: (err) => console.log(err)
     });
@@ -149,6 +141,11 @@ export class AmbassadorEquipmentComponent implements OnInit {
       },
       error: (err) => console.log(err)
     });
+    this.snackBar.open(
+      `Canceled staged checkout request of ${stagedRequest.model} by ${stagedRequest.user_name}`,
+      '',
+      { duration: 4000 }
+    );
   }
 
   // Gets the length of the observable array of checkout request models.
@@ -177,6 +174,11 @@ export class AmbassadorEquipmentComponent implements OnInit {
     this.equipmentService.returnCheckout(checkout).subscribe({
       next: (value) => {
         this.updateCheckoutTable();
+        this.snackBar.open(
+          `${checkout.user_name} has returned ${checkout.model} with id ${checkout.equipment_id}`,
+          '',
+          { duration: 4000 }
+        );
       },
       error: (err) => console.log(err)
     });

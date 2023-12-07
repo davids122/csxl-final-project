@@ -38,7 +38,8 @@
           <button
             mat-stroked-button
             color="primary"
-            (click)="approveStagedRequest.emit(request)">
+            (click)="approveStagedRequest.emit(request)"
+            [disabled]="!request.selected_id">
             Approve
           </button>
           <button

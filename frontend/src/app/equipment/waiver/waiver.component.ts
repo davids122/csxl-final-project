@@ -12,6 +12,7 @@ import { ErrorStateMatcher } from '@angular/material/core';
 import { Profile } from 'src/app/models.module';
 import { Subscription } from 'rxjs';
 import { ProfileService } from 'src/app/profile/profile.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-equipment-waiver',
@@ -34,7 +35,8 @@ export class WaiverComponent {
   constructor(
     private equipmentService: EquipmentService,
     private profileSvc: ProfileService,
-    public router: Router
+    public router: Router,
+    protected snackBar: MatSnackBar
   ) {
     this.profileSvc.profile$.subscribe((profile) => (this.profile = profile));
   }
@@ -46,7 +48,13 @@ export class WaiverComponent {
 
     this.equipmentService.update_waiver_field().subscribe({
       next: (value) => {
-        this.router.navigateByUrl('equipment');
+        this.router.navigateByUrl('equipment').then((navigated: boolean) => {
+          if (navigated) {
+            this.snackBar.open('You may now checkout equipment!', '', {
+              duration: 4000
+            });
+          }
+        });
       },
       error: (err) => console.log(err)
     });
