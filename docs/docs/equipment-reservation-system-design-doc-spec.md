@@ -38,33 +38,45 @@ This allows an ambassador to see all of the available equipment that can be chec
 
 This allows a user to update their has_signed_waiver field after signing waiver.
 
-## #2: Description of underlying database/entity-level representation decisions
+## Underlying database/entity-level representation decisions
 
 We have created two new entities with corresponding tables: Equipment and EquipmentCheckoutRequest. We needed an equipment entity because we need to sotre each individual piece of equipment. We decided to include an array to store notes about the condition of the equipment. An ambassador will eventually be able to evaluate condition of equipment upon return. Additionally, we needed an eqiupment checkout request entity to appropriately manage users requests for equipment checkouts. Each equipment checkout request has a model field. We decided to do this rather than having a specific piece of equipment tied to the request so that an ambassador can select the piece of equipment that will be checked out.
 
-## #3: At least one technical and one user experience design choice your team weighed the trade-offs with justification for the decision (we chose X over Y, because…)
+There are four new entity/model pairings for the equipment reservation feature, Equipment, EquipmentCheckoutRequest, StagedCheckoutRequest, and EquipmentCheckout.
 
-#### Technical Design Choice:
+Starting with Equipment, there is an _EquipmentEntity_ that encapsulates information about each specific item of equipment in the CSXL inventory. The entity specifies the unique equipment_id, model name ('type of equipment'), image, condition, checkout status, notes on condition, and a history of students who have checked it out. Currently, the condition, condition notes, and checkout history are not used. In the future, these properties should be used to help admin manage equipment, and to hold users accountable for consistent irresponsibility with equipment.
 
-We decided to have seperate data representations for checkout requests and checkouts rather than having them be the same model/entity and having a status field(request, checked_out, returned). We chose this because need to be able to easily differentiate between checkouts that are pending and checkouts that are confirmed. In the future, ambassadors may be able to view past checkouts and information about requests would be not needed.
+Next, there is an _EquipmentCheckoutRequestEntity_ that is created once a user attempts to checkout an item of equipment. All checkout requests will be sent to a CSXL ambassador to be approved. This entity stores the name of the user requesting the equipment, said user's PID, the model of the requested equipment. A specific item of equipment is not stored with the checkout to give the ambasador the responsibilty of selecting an appropriate item of based off of condition.
+
+There is a _StagedCheckoutRequestEntity_ that is created when an ambassador presses the "Stage" button on the checkout request. When this happens, the ambassador will retrieve the equipment item from the CSXL inventory, select the equipment_id of the selected equipment, and approve the checkout when the user is given their equipment. For this functionality, the entity stores the name of the user checking out the equipment, the model name of the equipment, the pid of the user, and a list of the IDs of all available equipment of the desired model.
+
+There is an _EquipmentCheckoutEntity_ that is created when an ambassador succesfully approves a staged checkout request. The entity stores the user name and PID of the user who checked out the item, the ID and model of the specific equipment item, status of the checkout (active or returned), and the dates of the start and end of the checkout period. The end time defaults to 3 days after the start time as a due date, and upon return is updated to the time of return. Returned checkouts stay in the database even though they are not currently used. Future features can query returned checkouts to gather information as needed.
+
+## Technical and User Design Choices
+
+#### Separate Data Tables for Various Phases of a Checkout:
+
+There are seperate data representations for checkout requests, staged checkout requests, and checkouts rather than having them be the same model/entity and having status fields (request, staged, checked_out, returned). This allows for easy differentiation between checkouts that are pending, staged, and confirmed. In the future, ambassadors may be able to view past checkouts, and information about requests would be not needed.
 
 #### User Experience Design Choice
 
-For the ambassador view we decided to have a table containing "staged checkouts". This is used to show checkouts that are in the process of being confirmed by the ambassador(Ambassador is physically going to get the device and then selecting corresponding ID). We did this instead of directly confirming to allow the ambassador to "stage" a request, go look at equipment that is available, choose a piece of equipment, and select this piece of equipment on the application. This gives the ambassador control over what piece of equipment is being checked out.
+For the ambassador view there is a table containing "staged checkouts". This is used to show checkouts that are in the process of being confirmed by the ambassador (ambassador is physically going to get the device and then selecting corresponding ID). This approach was preferred over directly confirming checkouts to allow the ambassador to "stage" a request, physically look at equipment that is available, choose an item of equipment, and select this item on the application. This gives the ambassador control over what item of equipment is being checked out to guarantee users recieve the best available equipment.
 
-## #4 Development concerns: How does a new developer get started on your feature? Brief guide/tour of the files and concerns they need to understand to get up-to-speed.
+## Getting Started
 
 #### Frontend
 
-- Equipment Module: This declares each component and widget related to equipment feature. This module imports any angular material components/modules used for the feature.
+- Equipment Module: This declares each component, widget, and the service related to equipment feature. This module imports any angular material components/modules used for the feature.
 - User-Equipment Component: This contains the equipment card widgets for each equipment type. Calls the equipment service, which in turn calls the API route for getting all equipment_types.
 - Equipment Card Widget: This widget displays equipment type information including model, picture, and number available.
-- Ambassador Component: This component contains the checkout request card and staged checkout request card widgets.
-- Checkout request card: This displays all checkout request that have been made by users.
-- Staged checkout request card: This widget displays all staged checkout requests. Ambassador can select a piece of equipment by it's id in this table.
+- Ambassador Component: This component contains the checkout request card, staged checkout request card widgets, and checkout cards. The display is tabbed into two sections, the left containing pending checkouts (checkout requests and staged requests), the right containing confirmed, active checkouts.
+- Checkout request card: This displays all checkout request that have been made by users. There is a button to "Stage" the request, which creates a staged checkout request, and a button to "Cancel" the request, which removes the request from the view and the database.
+- Staged checkout request card: This widget displays all staged checkout requests. Ambassador can select a piece of equipment by it's ID in this table. The IDs are chosen from a dropdown list. To the right of that, is a button to "Approve" the checkout, which creates a checkout, and a button to "Cancel" the staged checkout, which removes it from the view and the database.
+- Checkout card: This widget displays all confirmed, active checkouts. Ambassador can press the "Return" button to return the checkouts when the user brings them back to the CSXL.
 - Waiver Component: This component displays a fake waiver and requires an input to the signiture field. It is only routed to if the user has not yet signed the waiver. After submission, it routes back to the user equipment component.
 - EquipmentCheckoutConfirmationComponent: Confirms that a user has requested an equipment checkout request.
 - EquipmentService: Communicates with the backend, to control everything that the frontend needs to know to manage the creation and confirmation of checkout requests.
+-
 
 #### Backend
 
