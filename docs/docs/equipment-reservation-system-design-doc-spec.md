@@ -2,6 +2,39 @@
 
 ## #1: Descriptions and sample data representations of new or modified model representation(s) and API routes supporting your feature’s stories
 
+### Authors
+
+- Jacob Brown
+  * https://github.com/jacbro2021
+- Nicholas Mountain
+  * https://github.com/nicholasmountain11
+- Ayden Franklin
+  * https://github.com/aydenpf
+- David Sprague
+  * https://github.com/davids122
+
+### Personas & Images
+
+#### Sally Student
+
+![Equipment Page](../images/equipment-page.png "Equipment Page")
+
+When Sally Student navigates to the Equipment tab on the left sidebar, Sally will see cards representing all of the currently available equipment, as well as the number of equipment items for each type that are available. If Sally has already filled out the wavier, then Sally can click the checkout button to submit a checkout request for a given type of equipment. Otherwise, Sally will be navigated to the wavier page to fill out the wavier before continuing with the checkout process.
+
+![Wavier Page](../images/wavier-page.png "Wavier Page")
+
+If a student attempts to checkout an item and they have never filled out the wavier before, they will be automatically navigated to this page. The student will need to sign their name in the text box before continuing. Once the student has signed the wavier, they are navigated back to the Equipment page to select they equipment they would like to make a request for. 
+
+#### Amy Ambassador
+
+![Equipment Checkouts](../images/stage_and_checkout_requests.png "Equipment Checkouts")
+
+When Amy Ambassador navigates to the XL Equipment tab on the left sidebar, they will see the Equipment Checkout Requests table as well as the Staged Checkout Requests table. Amy Ambassador can move a checkout request to the staged request table by hitting the "stage" button. This is intended to be done when Amy is about to select the equipment item and give it to the person checking it out. After Amy gives the item to the student, Amy clicks the approve button which sends the item to the Current Checkouts tab in the top right (see next image).
+
+![Equipment Checkouts](../images/equipment_checkouts.png "Equipment Checkouts")
+
+Amy Ambassador can view all of the currently checked out items in the Current Checkouts tab. Amy can also view the model, id, due date, and the name of the person with the item checked out for every checkout in this table. When a user returns their equipment, Amy will select the return button on this page to finalize the return. 
+
 ### Models
 
 [New: Equipment Checkout Request Model Permalink](https://github.com/comp423-23f/csxl-final-team-d9/blob/d304096272b3f7eee05019938bc392cc9889ad48/backend/models/equipment_checkout_request.py#L11-L21)
@@ -69,6 +102,7 @@ For the ambassador view there is a table containing "staged checkouts". This is 
 - Equipment Module: This declares each component, widget, and the service related to equipment feature. This module imports any angular material components/modules used for the feature.
 - User-Equipment Component: This contains the equipment card widgets for each equipment type. Calls the equipment service, which in turn calls the API route for getting all equipment_types.
 - Equipment Card Widget: This widget displays equipment type information including model, picture, and number available.
+- Equipment Type Model: Model to format data recieved from the backend such that it can be displayed in the equipment card widget. 
 - Ambassador Component: This component contains the checkout request card, staged checkout request card widgets, and checkout cards. The display is tabbed into two sections, the left containing pending checkouts (checkout requests and staged requests), the right containing confirmed, active checkouts.
 - Checkout request card: This displays all checkout request that have been made by users. There is a button to "Stage" the request, which creates a staged checkout request, and a button to "Cancel" the request, which removes the request from the view and the database.
 - Staged checkout request card: This widget displays all staged checkout requests. Ambassador can select a piece of equipment by it's ID in this table. The IDs are chosen from a dropdown list. To the right of that, is a button to "Approve" the checkout, which creates a checkout, and a button to "Cancel" the staged checkout, which removes it from the view and the database.
@@ -76,12 +110,17 @@ For the ambassador view there is a table containing "staged checkouts". This is 
 - Waiver Component: This component displays a fake waiver and requires an input to the signiture field. It is only routed to if the user has not yet signed the waiver. After submission, it routes back to the user equipment component.
 - EquipmentCheckoutConfirmationComponent: Confirms that a user has requested an equipment checkout request.
 - EquipmentService: Communicates with the backend, to control everything that the frontend needs to know to manage the creation and confirmation of checkout requests.
--
+- Equipment Model: defines the layout of data retrieved from the Equipment service API.
+- Checkout Request Model: Defines the format of the data that is presented in the checkout request card.
+- Staged Checkout Request Model: Defines the format of the data that is presented in the staged checkout request card. When checkout requests are "staged", the checkout request data is converted into a staged checkout request model. 
 
 #### Backend
 
-- Entities: Equipment Entity: Stores data about a specific piece of equipment.
-  Checkout Request Entity: Stores data about a checkout request made by a user.
+- Entities: 
+  * Equipment Entity: Stores data about a specific piece of equipment.
+  * Checkout Request Entity: Stores data about a checkout request made by a user.
+  * Staged Checkout Request Entity: Persists data for the stage table in the frontend.
+  * Checkout Entity: Persists data for currently checked out equipment items. 
 - Equipment Service: Handles all the logic for manipulating the database, called by the api routes.
 - user_equipment_tests: Tests all methods in the equipment service.
 - API Routes: Calls equipment service methods to communicate data changes and logic to and from the frontend.
