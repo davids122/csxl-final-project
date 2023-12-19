@@ -151,7 +151,12 @@ def test_list_enforces_permission(
 
 def test_create_user_as_user_registration(user_svc: UserService):
     """Test that a user can be created for registration purposes."""
-    new_user = NewUser(pid=123456789, onyen="new_user", email="new_user@unc.edu")
+    new_user = NewUser(
+        pid=123456789,
+        onyen="new_user",
+        email="new_user@unc.edu",
+        signed_equipment_wavier=False,
+    )
     created_user = user_svc.create(new_user, new_user)
     assert created_user is not None
     assert created_user.id is not None
@@ -159,7 +164,12 @@ def test_create_user_as_user_registration(user_svc: UserService):
 
 def test_create_user_as_root(user_svc: UserService):
     """Test that a user can be created by a root user as an administrator."""
-    new_user = NewUser(pid=123456789, onyen="new_user", email="new_user@unc.edu")
+    new_user = NewUser(
+        pid=123456789,
+        onyen="new_user",
+        email="new_user@unc.edu",
+        signed_equipment_wavier=False,
+    )
     created_user = user_svc.create(root, new_user)
     assert created_user is not None
     assert created_user.id is not None
@@ -169,7 +179,12 @@ def test_create_user_enforces_permission(
     user_svc: UserService, permission_svc_mock: PermissionService
 ):
     """Test that user.create on user/ is enforced by the create method"""
-    new_user = NewUser(pid=123456789, onyen="new_user", email="new_user@unc.edu")
+    new_user = NewUser(
+        pid=123456789,
+        onyen="new_user",
+        email="new_user@unc.edu",
+        signed_equipment_wavier=False,
+    )
     user_svc.create(root, new_user)
     permission_svc_mock.enforce.assert_called_with(root, "user.create", "user/")
 

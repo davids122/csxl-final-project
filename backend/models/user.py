@@ -1,6 +1,7 @@
 """User model serves as the data object for representing registered users across application layers."""
 
 from pydantic import BaseModel
+from backend.models.equipment import Equipment
 
 __authors__ = ["Kris Jordan"]
 __copyright__ = "Copyright 2023"
@@ -35,6 +36,7 @@ class User(UserIdentity, BaseModel):
     github: str = ""
     github_id: int | None = None
     github_avatar: str | None = None
+    signed_equipment_wavier: bool = False
 
 
 class NewUser(User, BaseModel):

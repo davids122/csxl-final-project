@@ -1,0 +1,71 @@
+<mat-tab-group>
+  <mat-tab label="Checkout Requests">
+    <!-- Table to display checkout requests -->
+    <div>
+      <checkout-request-card
+        *ngIf="
+          checkoutRequestsLength && checkoutRequestsLength >= 1;
+          else noUpcoming
+        "
+        [checkoutRequests]="checkoutRequests$"
+        (approveRequest)="approveRequest($event)"
+        (cancelRequest)="cancelRequest($event)" />
+
+      <!-- Template for when there are no checkout requests -->
+      <ng-template #noUpcoming>
+        <mat-card class="content" appearance="outlined">
+          <mat-card-header>
+            <mat-card-title> Equipment Checkout Requests </mat-card-title>
+          </mat-card-header>
+          <mat-card-content> No upcoming checkout requests. </mat-card-content>
+        </mat-card>
+      </ng-template>
+    </div>
+
+    <div class="staged-request-container">
+    <!-- Table to display staged requests -->
+      <staged-checkout-request-card
+        *ngIf="
+          stagedCheckoutRequestsLength && stagedCheckoutRequestsLength >= 1;
+          else noStagedRequests
+        "
+        [stagedCheckoutRequests]="stagedCheckoutRequests$"
+        (approveStagedRequest)="approveStagedRequest($event)"
+        (cancelStagedRequest)="cancelStagedRequest($event)" />
+
+      <!-- Template for when there are no staged requests -->
+      <ng-template #noStagedRequests>
+        <mat-card class="content" appearance="outlined">
+          <mat-card-header>
+            <mat-card-title> Staged Checkout Requests </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            There are no staged requests at this time.
+          </mat-card-content>
+        </mat-card>
+      </ng-template>
+    </div>
+  </mat-tab>
+
+  <mat-tab label="Current Checkouts">
+    <div class="checkout-container">
+    <!-- Table to display checkouts -->
+      <equipment-checkout-card
+        *ngIf="checkoutsLength && checkoutsLength >= 1; else noCheckouts"
+        [checkouts]="equipmentCheckouts$"
+        (returnEquipment)="returnEquipment($event)" />
+
+      <!-- Template for when there are no checkouts -->
+      <ng-template #noCheckouts>
+        <mat-card class="content" appearance="outlined">
+          <mat-card-header>
+            <mat-card-title> Current Equipment Checkouts </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            There are no active checkouts at this time.
+          </mat-card-content>
+        </mat-card>
+      </ng-template>
+    </div>
+  </mat-tab>
+</mat-tab-group>

@@ -20,6 +20,7 @@ export interface Profile {
   github: string | null;
   github_id: number | null;
   github_avatar: string | null;
+  signed_equipment_wavier: boolean;
 }
 
 /** Interface for UserSummary Type (used on frontend for user requests) */

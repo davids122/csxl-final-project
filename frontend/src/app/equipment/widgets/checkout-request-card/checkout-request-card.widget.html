@@ -1,0 +1,44 @@
+<div>
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-card-title> Equipment Checkout Requests </mat-card-title>
+    </mat-card-header>
+    <table mat-table [dataSource]="checkoutRequests">
+      <!--Column to hold the name of the user submitting the request.-->
+      <ng-container matColumnDef="Name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let request">{{ request.user_name }}</td>
+      </ng-container>
+
+      <!--Column to hold the model of the equipment being requested.-->
+      <ng-container matColumnDef="Model">
+        <th mat-header-cell *matHeaderCellDef>Model</th>
+        <td mat-cell *matCellDef="let request">{{ request.model }}</td>
+      </ng-container>
+
+      <!--Column to complete a given user's checkout-->
+      <ng-container matColumnDef="Action">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let request">
+          <!-- Approve button -->
+          <button
+            mat-stroked-button
+            color="primary"
+            (click)="approveRequest.emit(request)">
+            Stage
+          </button>
+          <!-- Cancel Button -->
+          <button
+            mat-stroked-button
+            color="warn"
+            (click)="cancelRequest.emit(request)">
+            Cancel
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+      <tr mat-row *matRowDef="let checkout; columns: columnsToDisplay"></tr>
+    </table>
+  </mat-card>
+</div>

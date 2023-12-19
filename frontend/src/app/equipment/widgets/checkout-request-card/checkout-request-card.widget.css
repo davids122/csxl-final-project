@@ -1,0 +1,15 @@
+.mat-mdc-card {
+    max-width: 100%;
+}
+
+.mat-column-Name {
+    width: 24%;
+}
+
+.mat-column-Model {
+    width: 33%
+}
+
+.mat-column-Actions {
+    width: 30%;
+}

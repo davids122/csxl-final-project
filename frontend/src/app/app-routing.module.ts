@@ -7,7 +7,9 @@ import { ProfileEditorComponent } from './profile/profile-editor/profile-editor.
 import { CoworkingPageComponent } from './coworking/coworking-home/coworking-home.component';
 import { AmbassadorPageComponent } from './coworking/ambassador-home/ambassador-home.component';
 import { AboutComponent } from './about/about.component';
-
+import { UserEquipmentComponent } from './equipment/user-equipment/user-equipment.component';
+import { WaiverComponent } from './equipment/waiver/waiver.component';
+import { AmbassadorEquipmentComponent } from './equipment/ambassador-equipment/ambassador-equipment.component';
 const routes: Routes = [
   HomeComponent.Route,
   AboutComponent.Route,
@@ -15,6 +17,8 @@ const routes: Routes = [
   GateComponent.Route,
   CoworkingPageComponent.Route,
   AmbassadorPageComponent.Route,
+  UserEquipmentComponent.Route,
+  AmbassadorEquipmentComponent.Route,
   {
     path: 'coworking',
     title: 'Cowork in the XL',
@@ -40,6 +44,11 @@ const routes: Routes = [
     title: 'Experimental',
     loadChildren: () =>
       import('./event/event.module').then((m) => m.EventModule)
+  },
+  {
+    path: 'equipment',
+    loadChildren: () =>
+      import('./equipment/equipment.module').then((m) => m.EquipmentModule)
   }
 ];
 

@@ -1,0 +1,52 @@
+<div>
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-card-title> Current Equipment Checkouts </mat-card-title>
+    </mat-card-header>
+
+    <!-- Table to display all of active equipment checkouts -->
+    <table mat-table [dataSource]="checkouts">
+      <!--Column to hold the name of the user that has the equipment checked out.-->
+      <ng-container matColumnDef="Name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let checkout">{{ checkout.user_name }}</td>
+      </ng-container>
+
+      <!--Column to hold the model of the equipment checked out-->
+      <ng-container matColumnDef="Model">
+        <th mat-header-cell *matHeaderCellDef>Model</th>
+        <td mat-cell *matCellDef="let checkout">{{ checkout.model }}</td>
+      </ng-container>
+
+      <!--Column to hold the equipment ID-->
+      <ng-container matColumnDef="Equipment ID">
+        <th mat-header-cell *matHeaderCellDef>Equipment ID</th>
+        <td mat-cell *matCellDef="let checkout">{{ checkout.equipment_id }}</td>
+      </ng-container>
+
+      <!--Column to hold when the equipment is due by-->
+      <ng-container matColumnDef="Return Due Date">
+        <th mat-header-cell *matHeaderCellDef>Return Due Date</th>
+        <td mat-cell *matCellDef="let checkout">
+          {{ checkout.end_at | date: 'M/dd/yyyy' }}
+        </td>
+      </ng-container>
+
+      <!--Column to return a piece of equipment-->
+      <ng-container matColumnDef="Action">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let checkout">
+          <button
+            mat-stroked-button
+            color="primary"
+            (click)="returnEquipment.emit(checkout)">
+            Return
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+      <tr mat-row *matRowDef="let checkout; columns: columnsToDisplay"></tr>
+    </table>
+  </mat-card>
+</div>

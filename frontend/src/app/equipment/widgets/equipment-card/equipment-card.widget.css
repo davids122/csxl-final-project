@@ -1,0 +1,41 @@
+.equipment-card {
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+    height: 300px; /* Set a fixed height */
+  }
+  
+  .card-content {
+    flex-grow: 1;
+  }
+  
+  .card-image-container {
+    overflow: hidden;
+  }
+  
+  .equipment-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    margin-top: 10px;
+  }
+  
+  .card-actions {
+    margin-top: auto; /* Push the button to the bottom of the card */
+  }
+
+  .badge {
+    display: inline-block;
+    border-radius: 15px;
+    margin-right: 4px;
+    padding: 0 12px;
+    color: white;
+}
+.available .badge {
+  background: #256123;
+}
+
+.none .badge {
+  background: #612d23;
+}
+  

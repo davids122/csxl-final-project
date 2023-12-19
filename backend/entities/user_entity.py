@@ -1,12 +1,14 @@
 """Definition of SQLAlchemy table-backed object mapping entity for Users."""
 
 
-from sqlalchemy import Integer, String
+from sqlalchemy import Integer, String, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import Self
 from .entity_base import EntityBase
 from .user_role_table import user_role_table
 from ..models import User
+from .equipment_entity import EquipmentEntity
+from ..models.equipment import Equipment
 
 __authors__ = ["Kris Jordan"]
 __copyright__ = "Copyright 2023"
@@ -41,6 +43,10 @@ class UserEntity(EntityBase):
     github_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
     # GitHub Avatar permalink for the user
     github_avatar: Mapped[str | None] = mapped_column(String(), nullable=True)
+    # True/False user has signed equipment wavier
+    signed_equipment_wavier: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False
+    )
 
     # All of the roles for the given user.
     # NOTE: This field establishes a many-to-many relationship between the users and roles table.
@@ -75,6 +81,7 @@ class UserEntity(EntityBase):
             github=model.github,
             github_id=model.github_id,
             github_avatar=model.github_avatar,
+            signed_equipment_wavier=model.signed_equipment_wavier,
         )
 
     def to_model(self) -> User:
@@ -95,6 +102,7 @@ class UserEntity(EntityBase):
             github_id=self.github_id,
             github_avatar=self.github_avatar,
             pronouns=self.pronouns,
+            signed_equipment_wavier=self.signed_equipment_wavier,
         )
 
     def update(self, model: User) -> None:
@@ -114,3 +122,4 @@ class UserEntity(EntityBase):
         self.github = model.github
         self.github_id = model.github_id or None
         self.github_avatar = model.github_avatar or ""
+        self.signed_equipment_wavier = model.signed_equipment_wavier
